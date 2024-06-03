@@ -62,12 +62,12 @@
         <label for="name">Nombre:</label>
         <input type="text" id="name" name="name" required>
         
-        <label for="song">Canción:</label>
-        <input list="songList" id="song" name="song" required>
-        <datalist id="songList"></datalist>
-        
         <label for="artist">Artista:</label>
-        <input type="text" id="artist" name="artist" required>
+        <input list="artistList" id="artist" name="artist" required>
+        <datalist id="artistList"></datalist>
+        
+        <label for="song">Canción:</label>
+        <input type="text" id="song" name="song" required>
         
         <button type="submit">Enviar Pedido</button>
     </form>
@@ -79,13 +79,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('songRequestForm');
             const requestList = document.getElementById('requestList');
-            const songList = document.getElementById('songList');
-            const songInput = document.getElementById('song');
             const artistInput = document.getElementById('artist');
+            const songInput = document.getElementById('song');
 
             const apiKey = 'AIzaSyC12jixhKe6UrOdqsKz5SVgOkR5tBHny4E';
             const spreadsheetId = '1bqlfloLYVMcdoFybgZDjxt9ZZtmUTaJhUneCDJ4rQy0';
-            const range = 'Sheet1!A2:B4000'; // Ajusta esto según tu hoja de cálculo.
+            const range = 'Sheet1!A2:B4000';
 
             function loadSongs() {
                 const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
@@ -102,12 +101,13 @@
                         }
                         const rows = data.values;
                         if (rows.length > 0) {
+                            const artists = [];
                             rows.forEach(row => {
-                                const option = document.createElement('option');
-                                option.value = row[1]; // Nombre de la canción.
-                                option.dataset.artist = row[0]; // Artista.
-                                songList.appendChild(option);
+                                const artist = row[0];
+                                const song = row[1];
+                                artists.push({ artist, song });
                             });
+                            fillDataList(artists);
                         } else {
                             console.error('No se encontraron datos en la hoja de cálculo.');
                         }
@@ -115,23 +115,47 @@
                     .catch(error => console.error('Error al cargar las canciones:', error));
             }
 
+            function fillDataList(artists) {
+                const artistList = document.getElementById('artistList');
+                const uniqueArtists = [...new Set(artists.map(artist => artist.artist))];
+                uniqueArtists.forEach(artist => {
+                    const option = document.createElement('option');
+                    option.value = artist;
+                    artistList.appendChild(option);
+                });
+            }
+
+            function fillSongInput(artist) {
+                const filteredSongs = artist ? artists.filter(entry => entry.artist === artist) : artists;
+                const songList = filteredSongs.map(entry => entry.song);
+                songInput.value = '';
+                songInput.removeAttribute('list');
+                setTimeout(() => {
+                    songInput.setAttribute('list', 'songList');
+                    const datalist = document.getElementById('songList');
+                    datalist.innerHTML = '';
+                    songList.forEach(song => {
+                        const option = document.createElement('option');
+                        option.value = song;
+                        datalist.appendChild(option);
+                    });
+                }, 0);
+            }
+
+            let artists = [];
             loadSongs();
 
-            songInput.addEventListener('input', () => {
-                const selectedOption = Array.from(songList.options).find(option => option.value === songInput.value);
-                if (selectedOption) {
-                    artistInput.value = selectedOption.dataset.artist;
-                } else {
-                    artistInput.value = '';
-                }
+            artistInput.addEventListener('input', () => {
+                const artist = artistInput.value;
+                fillSongInput(artist);
             });
 
             form.addEventListener('submit', (event) => {
                 event.preventDefault();
                 
                 const name = document.getElementById('name').value;
-                const song = songInput.value;
                 const artist = artistInput.value;
+                const song = songInput.value;
 
                 const listItem = document.createElement('li');
                 listItem.textContent = `${name} pidió la canción "${song}" de ${artist}`;
