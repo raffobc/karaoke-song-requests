@@ -63,7 +63,8 @@
         <input type="text" id="name" name="name" required>
         
         <label for="search">Buscar:</label>
-        <input type="text" id="search" name="search" required>
+        <input type="text" id="search" name="search" list="searchList" required>
+        <datalist id="searchList"></datalist>
         
         <label for="artist">Artista:</label>
         <input type="text" id="artist" name="artist" readonly>
@@ -119,51 +120,20 @@
             }
 
             function fillDataList(artists) {
-                const artistList = document.getElementById('artistList');
-                const songList = document.getElementById('songList');
-                const uniqueArtists = [...new Set(artists.map(artist => artist.artist))];
-                const uniqueSongs = [...new Set(artists.map(artist => artist.song))];
-                uniqueArtists.forEach(artist => {
+                const searchList = document.getElementById('searchList');
+                artists.forEach(item => {
                     const option = document.createElement('option');
-                    option.value = artist;
-                    artistList.appendChild(option);
-                });
-                uniqueSongs.forEach(song => {
-                    const option = document.createElement('option');
-                    option.value = song;
-                    songList.appendChild(option);
+                    option.value = `${item.artist} - ${item.song}`;
+                    searchList.appendChild(option);
                 });
             }
 
             function fillInputs(value) {
-                const filteredArtists = artists.filter(entry => entry.artist === value);
-                const filteredSongs = artists.filter(entry => entry.song === value);
-                if (filteredArtists.length > 0) {
-                    const artist = filteredArtists[0].artist;
-                    artistInput.value = artist;
-                    fillSongInput(artist);
-                }
-                if (filteredSongs.length > 0) {
-                    const song = filteredSongs[0].song;
-                    songInput.value = song;
-                }
-            }
-
-            function fillSongInput(artist) {
-                const filteredSongs = artist ? artists.filter(entry => entry.artist === artist) : artists;
-                const songList = filteredSongs.map(entry => entry.song);
-                songInput.value = '';
-                songInput.removeAttribute('list');
-                setTimeout(() => {
-                    songInput.setAttribute('list', 'songList');
-                    const datalist = document.getElementById('songList');
-                    datalist.innerHTML = '';
-                    songList.forEach(song => {
-                        const option = document.createElement('option');
-                        option.value = song;
-                        datalist.appendChild(option);
-                    });
-                }, 0);
+                const selectedOption = value.split(' - ');
+                const selectedArtist = selectedOption[0];
+                const selectedSong = selectedOption[1];
+                artistInput.value = selectedArtist;
+                songInput.value = selectedSong;
             }
 
             let artists = [];
@@ -181,6 +151,10 @@
                 const artist = artistInput.value;
                 const song = songInput.value;
 
+				  // Almacenar el pedido localmente
+				const pedido = { name, artist, song };
+				almacenarPedidoLocalmente(pedido);
+				
                 const listItem = document.createElement('li');
                 listItem.textContent = `${name} pidió la canción "${song}" de ${artist}`;
 
@@ -191,5 +165,19 @@
             });
         });
     </script>
+	<script>
+		// Función para almacenar un pedido localmente
+		function almacenarPedidoLocalmente(pedido) {
+			const pedidoJSON = JSON.stringify(pedido);
+			localStorage.setItem('pedido', pedidoJSON);
+		}
+
+		// Función para recuperar un pedido almacenado localmente
+		function recuperarPedidoLocalmente() {
+			const pedidoJSON = localStorage.getItem('pedido');
+			const pedido = JSON.parse(pedidoJSON);
+			return pedido;
+		}
+	</script>	
 </body>
 </html>
