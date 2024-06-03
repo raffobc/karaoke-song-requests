@@ -136,6 +136,12 @@
                 songInput.value = selectedSong;
             }
 
+            function almacenarPedidoLocalmente(pedido) {
+                const pedidosExistente = JSON.parse(localStorage.getItem('pedidos')) || [];
+                pedidosExistente.push(pedido);
+                localStorage.setItem('pedidos', JSON.stringify(pedidosExistente));
+            }
+
             let artists = [];
             loadSongs();
 
@@ -151,10 +157,9 @@
                 const artist = artistInput.value;
                 const song = songInput.value;
 
-				  // Almacenar el pedido localmente
-				const pedido = { name, artist, song };
-				almacenarPedidoLocalmente(pedido);
-				
+                const pedido = { name, artist, song };
+                almacenarPedidoLocalmente(pedido);
+
                 const listItem = document.createElement('li');
                 listItem.textContent = `${name} pidió la canción "${song}" de ${artist}`;
 
@@ -165,19 +170,5 @@
             });
         });
     </script>
-	<script>
-		// Función para almacenar un pedido localmente
-		function almacenarPedidoLocalmente(pedido) {
-			const pedidoJSON = JSON.stringify(pedido);
-			localStorage.setItem('pedido', pedidoJSON);
-		}
-
-		// Función para recuperar un pedido almacenado localmente
-		function recuperarPedidoLocalmente() {
-			const pedidoJSON = localStorage.getItem('pedido');
-			const pedido = JSON.parse(pedidoJSON);
-			return pedido;
-		}
-	</script>	
 </body>
 </html>

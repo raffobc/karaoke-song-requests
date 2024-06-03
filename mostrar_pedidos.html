@@ -4,21 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mostrar Pedidos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background-color: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
 <body>
-    <h1>Pedidos Almacenados Localmente</h1>
+    <h1>Pedidos Almacenados</h1>
     <ul id="pedidoList"></ul>
 
     <script>
-        // Recuperar y mostrar los datos almacenados localmente
         document.addEventListener('DOMContentLoaded', () => {
             const pedidoList = document.getElementById('pedidoList');
-            const pedidoJSON = localStorage.getItem('pedido');
-            if (pedidoJSON) {
-                const pedido = JSON.parse(pedidoJSON);
-                const listItem = document.createElement('li');
-                listItem.textContent = `Nombre: ${pedido.name}, Artista: ${pedido.artist}, Canción: ${pedido.song}`;
-                pedidoList.appendChild(listItem);
+            const pedidosExistente = JSON.parse(localStorage.getItem('pedidos')) || [];
+            
+            if (pedidosExistente.length > 0) {
+                pedidosExistente.forEach(pedido => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Nombre: ${pedido.name}, Artista: ${pedido.artist}, Canción: ${pedido.song}`;
+                    pedidoList.appendChild(listItem);
+                });
             } else {
                 const listItem = document.createElement('li');
                 listItem.textContent = 'No hay pedidos almacenados';
