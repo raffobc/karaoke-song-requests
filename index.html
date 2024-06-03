@@ -62,12 +62,16 @@
         <label for="name">Nombre:</label>
         <input type="text" id="name" name="name" required>
         
+        <label for="search">Buscar:</label>
+        <input type="text" id="search" name="search" required>
+        
         <label for="artist">Artista:</label>
         <input list="artistList" id="artist" name="artist" required>
         <datalist id="artistList"></datalist>
         
         <label for="song">Canción:</label>
-        <input type="text" id="song" name="song" required>
+        <input list="songList" id="song" name="song" required>
+        <datalist id="songList"></datalist>
         
         <button type="submit">Enviar Pedido</button>
     </form>
@@ -79,6 +83,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('songRequestForm');
             const requestList = document.getElementById('requestList');
+            const searchInput = document.getElementById('search');
             const artistInput = document.getElementById('artist');
             const songInput = document.getElementById('song');
 
@@ -117,12 +122,33 @@
 
             function fillDataList(artists) {
                 const artistList = document.getElementById('artistList');
+                const songList = document.getElementById('songList');
                 const uniqueArtists = [...new Set(artists.map(artist => artist.artist))];
+                const uniqueSongs = [...new Set(artists.map(artist => artist.song))];
                 uniqueArtists.forEach(artist => {
                     const option = document.createElement('option');
                     option.value = artist;
                     artistList.appendChild(option);
                 });
+                uniqueSongs.forEach(song => {
+                    const option = document.createElement('option');
+                    option.value = song;
+                    songList.appendChild(option);
+                });
+            }
+
+            function fillInputs(value) {
+                const filteredArtists = artists.filter(entry => entry.artist === value);
+                const filteredSongs = artists.filter(entry => entry.song === value);
+                if (filteredArtists.length > 0) {
+                    const artist = filteredArtists[0].artist;
+                    artistInput.value = artist;
+                    fillSongInput(artist);
+                }
+                if (filteredSongs.length > 0) {
+                    const song = filteredSongs[0].song;
+                    songInput.value = song;
+                }
             }
 
             function fillSongInput(artist) {
@@ -145,9 +171,9 @@
             let artists = [];
             loadSongs();
 
-            artistInput.addEventListener('input', () => {
-                const artist = artistInput.value;
-                fillSongInput(artist);
+            searchInput.addEventListener('input', () => {
+                const value = searchInput.value;
+                fillInputs(value);
             });
 
             form.addEventListener('submit', (event) => {
