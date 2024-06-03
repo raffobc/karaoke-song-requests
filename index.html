@@ -81,12 +81,10 @@
             const requestList = document.getElementById('requestList');
             const songList = document.getElementById('songList');
 
-            // Reemplaza 'YOUR_API_KEY' y 'YOUR_SPREADSHEET_ID' con tus valores.
             const apiKey = 'AIzaSyC12jixhKe6UrOdqsKz5SVgOkR5tBHny4E';
             const spreadsheetId = '1bqlfloLYVMcdoFybgZDjxt9ZZtmUTaJhUneCDJ4rQy0';
-            const range = 'Sheet1!A2:B4000'; // Ajusta esto según tu hoja de cálculo.
+            const range = 'Sheet1!A2:B4000';
 
-            // Función para cargar canciones desde Google Sheets.
             function loadSongs() {
                 const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
                 fetch(url)
@@ -105,7 +103,7 @@
                             rows.forEach(row => {
                                 const option = document.createElement('option');
                                 option.value = row[0]; // Nombre de la canción.
-                                option.textContent = `${row[0]} - ${row[1]}`; // Nombre de la canción - Artista.
+                                option.dataset.artist = row[1]; // Artista.
                                 songList.appendChild(option);
                             });
                         } else {
@@ -115,15 +113,15 @@
                     .catch(error => console.error('Error al cargar las canciones:', error));
             }
 
-            // Llama a la función para cargar las canciones.
             loadSongs();
 
             form.addEventListener('submit', (event) => {
                 event.preventDefault();
                 
                 const name = document.getElementById('name').value;
-                const song = document.getElementById('song').value;
-                const artist = document.getElementById('artist').value;
+                const songInput = document.getElementById('song');
+                const song = songInput.value;
+                const artist = songInput.selectedOptions[0] ? songInput.selectedOptions[0].dataset.artist : document.getElementById('artist').value;
 
                 const listItem = document.createElement('li');
                 listItem.textContent = `${name} pidió la canción "${song}" de ${artist}`;
@@ -131,11 +129,13 @@
                 requestList.appendChild(listItem);
 
                 form.reset();
+                alert('¡Pedido enviado con éxito!');
             });
         });
     </script>
 </body>
 </html>
+
 
 
 
