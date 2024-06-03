@@ -81,19 +81,27 @@
             const requestList = document.getElementById('requestList');
             const songList = document.getElementById('songList');
 
-            // Reemplaza 'TU_API_KEY' y 'TU_SPREADSHEET_ID' con tus valores.
+            // Reemplaza 'YOUR_API_KEY' y 'YOUR_SPREADSHEET_ID' con tus valores.
             const apiKey = 'AIzaSyC12jixhKe6UrOdqsKz5SVgOkR5tBHny4E';
             const spreadsheetId = '1bqlfloLYVMcdoFybgZDjxt9ZZtmUTaJhUneCDJ4rQy0';
-            const range = 'hoja1!A2:B2'; // Ajusta esto según tu hoja de cálculo.
+            const range = 'Sheet1!A2:B4000'; // Ajusta esto según tu hoja de cálculo.
 
             // Función para cargar canciones desde Google Sheets.
             function loadSongs() {
                 const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?key=${apiKey}`;
                 fetch(url)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
+                        if (!data.values) {
+                            throw new Error('No se encontraron datos en la hoja de cálculo.');
+                        }
                         const rows = data.values;
-                        if (rows && rows.length > 0) {
+                        if (rows.length > 0) {
                             rows.forEach(row => {
                                 const option = document.createElement('option');
                                 option.value = row[0]; // Nombre de la canción.
@@ -128,5 +136,6 @@
     </script>
 </body>
 </html>
+
 
 
