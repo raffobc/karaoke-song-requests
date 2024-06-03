@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mostrar Pedidos</title>
+</head>
+<body>
+    <h1>Pedidos Almacenados Localmente</h1>
+    <ul id="pedidoList"></ul>
+
+    <script>
+        // Recuperar y mostrar los datos almacenados localmente
+        document.addEventListener('DOMContentLoaded', () => {
+            const pedidoList = document.getElementById('pedidoList');
+            const pedidoJSON = localStorage.getItem('pedido');
+            if (pedidoJSON) {
+                const pedido = JSON.parse(pedidoJSON);
+                const listItem = document.createElement('li');
+                listItem.textContent = `Nombre: ${pedido.name}, Artista: ${pedido.artist}, Canción: ${pedido.song}`;
+                pedidoList.appendChild(listItem);
+            } else {
+                const listItem = document.createElement('li');
+                listItem.textContent = 'No hay pedidos almacenados';
+                pedidoList.appendChild(listItem);
+            }
+        });
+    </script>
+</body>
+</html>
