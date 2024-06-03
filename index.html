@@ -80,11 +80,11 @@
             const form = document.getElementById('songRequestForm');
             const requestList = document.getElementById('requestList');
             const songList = document.getElementById('songList');
-            
-            // Reemplaza 'YOUR_API_KEY' y 'YOUR_SPREADSHEET_ID' con tus valores.
+
+            // Reemplaza 'TU_API_KEY' y 'TU_SPREADSHEET_ID' con tus valores.
             const apiKey = 'AIzaSyC12jixhKe6UrOdqsKz5SVgOkR5tBHny4E';
             const spreadsheetId = '1bqlfloLYVMcdoFybgZDjxt9ZZtmUTaJhUneCDJ4rQy0';
-            const range = 'Sheet1!A2:B4000'; // Ajusta esto según tu hoja de cálculo.
+            const range = 'Sheet1!A2:B'; // Ajusta esto según tu hoja de cálculo.
 
             // Función para cargar canciones desde Google Sheets.
             function loadSongs() {
@@ -93,13 +93,15 @@
                     .then(response => response.json())
                     .then(data => {
                         const rows = data.values;
-                        if (rows.length > 0) {
+                        if (rows && rows.length > 0) {
                             rows.forEach(row => {
                                 const option = document.createElement('option');
                                 option.value = row[0]; // Nombre de la canción.
                                 option.textContent = `${row[0]} - ${row[1]}`; // Nombre de la canción - Artista.
                                 songList.appendChild(option);
                             });
+                        } else {
+                            console.error('No se encontraron datos en la hoja de cálculo.');
                         }
                     })
                     .catch(error => console.error('Error al cargar las canciones:', error));
@@ -126,3 +128,5 @@
     </script>
 </body>
 </html>
+
+
