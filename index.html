@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leer Base de Datos</title>
+    <!-- Incluir Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <style>
+        /* Estilos para la agenda */
+        .agenda {
+            list-style: none;
+            padding: 0;
+        }
+        .evento {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+        }
+        .evento h2 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .evento p {
+            margin: 0;
+        }
+    </style>
+    <script>
+        // Configuración de Firebase
+        var firebaseConfig = {
+            apiKey: "AIzaSyCLMQBTRT-E7Ix1PtfG9REYJX-_Zn7o0b8",
+            authDomain: "karaokedelivery-45729.firebaseapp.com",
+            projectId: "karaokedelivery-45729",
+            storageBucket: "karaokedelivery-45729.appspot.com",
+            messagingSenderId: "698577896474",
+            appId: "1:698577896474:web:d9226e1a0ff11e9f10fda3"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        var db = firebase.firestore();
+
+        // Función para leer y mostrar datos de Firestore
+        function mostrarDatos() {
+            var listaAgenda = document.getElementById('listaAgenda');
+
+            // Limpiar lista antes de agregar datos nuevos
+            listaAgenda.innerHTML = '';
+
+            // Obtener datos de Firestore y ordenarlos por el campo 'order' de forma descendente
+            db.collection("songs").orderBy("order", "desc").get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    // Crear elemento para cada evento
+                    var evento = document.createElement('li');
+                    evento.classList.add('evento');
+
+                    // Crear contenido del evento
+                    var titulo = document.createElement('h2');
+                    titulo.textContent = doc.data().name;
+
+                    var artista = document.createElement('p');
+                    artista.textContent = "Artista: " + doc.data().artist;
+
+                    var cancion = document.createElement('p');
+                    cancion.textContent = "Canción: " + doc.data().song;
+
+                    // Agregar contenido al evento
+                    evento.appendChild(titulo);
+                    evento.appendChild(artista);
+                    evento.appendChild(cancion);
+
+                    // Agregar evento a la lista
+                    listaAgenda.appendChild(evento);
+                });
+            });
+        }
+
+        // Función para actualizar la lista de eventos
+        function actualizarDatos() {
+            mostrarDatos(); // Simplemente volver a cargar los datos
+        }
+
+        // Función para borrar toda la base de datos
+        function borrarBaseDatos() {
+            if (confirm("¿Estás seguro de que deseas borrar toda la base de datos?")) {
+                db.collection("songs").get().then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        db.collection("songs").doc(doc.id).delete();
+                    });
+                    alert("Base de datos borrada exitosamente.");
+                    mostrarDatos(); // Actualizar la lista después de borrar
+                });
+            }
+        }
+
+        // Ejecutar la función al cargar la página
+        window.onload = function() {
+            mostrarDatos();
+        };
+    </script>
+</head>
+<body>
+    <h1>Base de Datos de Canciones</h1>
+    <button onclick="actualizarDatos()">Actualizar</button>
+    <button onclick="borrarBaseDatos()">Borrar Base de Datos</button>
+    <ul id="listaAgenda" class="agenda">
+        <!-- Los eventos se agregarán aquí mediante JavaScript -->
+    </ul>
+</body>
+</html>
